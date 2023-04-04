@@ -5,9 +5,46 @@ function App() {
 
   const [search, setSearch] = useState('')
   const [openModal, setOpenModal] = useState(false)
+  const [data, setData] = useState([])
+  const [countriesFilter, setCountriesFilter] = useState([])
 
   useEffect(() => {
-    if(search.length > 0){
+    const Data = async () => {
+      try {
+
+        const result = await fetch('https://countriesnow.space/api/v0.1/countries/currency')
+        const countries = await result.json()
+
+        const countriesState = countries.data.map(countrie => countrie.name)
+        setData(countriesState)
+
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    Data()
+  }, [])
+
+
+  const handleChange = e => {
+    setSearch(e.target.value);
+    filtrar(e.target.value);
+  }
+
+  const filtrar = (terminoBusqueda) => {
+    var resultadosBusqueda = data.filter((elemento) => {
+      if (elemento.toString().toLowerCase().includes(terminoBusqueda.toLowerCase())
+      ) {
+        return elemento;
+      }
+    });
+    setCountriesFilter(resultadosBusqueda);
+  }
+
+  console.log(countriesFilter)
+
+  useEffect(() => {
+    if (search.length > 0) {
       setOpenModal(true)
     }
   }, [search])
@@ -30,8 +67,7 @@ function App() {
       <input
         type='search'
         placeholder='Ingrese el BL'
-        value={search}
-        onChange={e => setSearch(e.target.value)}
+        onChange={handleChange}
       />
 
       <div>
@@ -40,7 +76,14 @@ function App() {
         <div id="myModal" className={openModal ? 'modal' : 'hidden'}>
           <div className="modal-content">
             <span className="close" onClick={handleModal}>&times;</span>
-            <p>Some text in the Modal..</p>
+            <p>Ciudad</p>
+            <span>{countriesFilter}</span>
+            <input
+              type='search'
+              placeholder='Ingrese el BL'
+              onChange={handleChange}
+              value={search}
+            />
           </div>
         </div>
 
